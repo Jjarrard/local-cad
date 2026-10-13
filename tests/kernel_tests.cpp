@@ -197,6 +197,20 @@ static void testManyHolesAndRepeatedCuts() {
     check("four successive cuts keep the face count linear", linear);
     checkNear("volume exact after four cuts", volumeOf(acc),
               40.0*40.0*20.0 - 4*ngonArea(20, 3.0f)*20.0, 0.5);
+
+    // The bored top and bottom faces must come back as one rectangle with
+    // exactly four round holes.  Copies of one corner used to be told apart
+    // by rounding, so seams failed to cancel: that left zero-area "holes",
+    // and with slightly different rounding (an x86 build) lost a face's
+    // outline altogether.
+    bool cleanCaps = true;
+    for (const auto& f : acc.faces) {
+        if (std::abs(f.normal.y) < 0.99f) continue;
+        if (f.outerLoop.size() != 4 || f.innerLoops.size() != 4) cleanCaps = false;
+        for (const auto& hole : f.innerLoops)
+            if (hole.size() != 20) cleanCaps = false;
+    }
+    check("four cuts leave each cap with exactly four 20-sided holes", cleanCaps);
 }
 
 static void testChamferFillet() {

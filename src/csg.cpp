@@ -224,6 +224,13 @@ void orientLoopTo(std::vector<Vec3>& loop, Vec3 dir) {
     if (n.dot(dir) < 0.0f) std::reverse(loop.begin(), loop.end());
 }
 
+// Unsigned area of a planar loop.
+float loopArea(const std::vector<Vec3>& loop) {
+    Vec3 n{0, 0, 0};
+    for (size_t i = 0; i < loop.size(); i++) n += loop[i].cross(loop[(i + 1) % loop.size()]);
+    return n.length() * 0.5f;
+}
+
 Solid polygonsToSolid(const std::vector<Polygon>& polys, Color col) {
     // Stage one: one face per surviving polygon, remembering where each came
     // from.  Stage two below stitches same-origin fragments back together.
@@ -278,10 +285,20 @@ Solid polygonsToSolid(const std::vector<Polygon>& polys, Color col) {
             merged.outerLoop = loops[0];
             orientLoopTo(merged.outerLoop, normals[seed]);
             for (size_t li = 1; li < loops.size(); li++) {
+                if (loopArea(loops[li]) < 1e-6f) continue;   // sliver, not a hole
                 std::vector<Vec3> hole = loops[li];
                 orientLoopTo(hole, -normals[seed]);
                 merged.innerLoops.push_back(std::move(hole));
             }
+
+            // The fragments are always right; the stitched outline is only an
+            // optimisation.  If it doesn't cover the same area, keep the
+            // fragments rather than lose (or invent) material.
+            float fragments = 0.0f;
+            for (uint32_t fi : mine) fragments += loopArea(scratch.faces[fi].outerLoop);
+            float stitched = loopArea(merged.outerLoop);
+            for (const auto& hole : merged.innerLoops) stitched -= loopArea(hole);
+            if (std::abs(stitched - fragments) > 1e-4f * std::max(1.0f, fragments)) continue;
             merged.normal    = normals[seed];
             merged.color     = colours[seed];
             merged.faceGroup = groups[seed];

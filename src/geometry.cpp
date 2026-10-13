@@ -1,4 +1,5 @@
 #include "geometry.h"
+#include <array>
 #include <unordered_map>
 #include <algorithm>
 #include <cmath>
@@ -532,12 +533,20 @@ std::vector<std::vector<Vec3>> Solid::regionBoundaryLoops(
         const std::vector<uint32_t>& region) const {
     if (region.empty()) return {};
 
-    auto key = [](const Vec3& v) -> uint64_t {
-        auto q = [](float f) -> int64_t { return (int64_t)std::llround((double)f * 10000.0); };
+    // Points closer than this are the same corner.  Matching is by distance,
+    // searching the neighbouring grid cells too: hashing rounded coordinates
+    // alone splits two copies of one corner whenever rounding error puts them
+    // either side of a cell boundary, and then the seam between them never
+    // cancels.
+    const float weld = 1e-4f;
+    auto cellOf = [&](const Vec3& v) {
+        return std::array<int64_t, 3>{ (int64_t)std::floor(v.x / weld),
+                                       (int64_t)std::floor(v.y / weld),
+                                       (int64_t)std::floor(v.z / weld) };
+    };
+    auto cellKey = [](int64_t x, int64_t y, int64_t z) -> uint64_t {
         uint64_t h = 1469598103934665603ULL;
-        for (int64_t part : { q(v.x), q(v.y), q(v.z) }) {
-            h ^= (uint64_t)part; h *= 1099511628211ULL;
-        }
+        for (int64_t part : { x, y, z }) { h ^= (uint64_t)part; h *= 1099511628211ULL; }
         return h;
     };
 
@@ -546,14 +555,20 @@ std::vector<std::vector<Vec3>> Solid::regionBoundaryLoops(
     // neighbour treats as a corner, so seams only cancel after being split at
     // those intervening points.
     std::vector<Vec3> points;
-    std::unordered_map<uint64_t, uint32_t> pointIds;
+    std::unordered_map<uint64_t, std::vector<uint32_t>> grid;
     auto idOf = [&](const Vec3& v) -> uint32_t {
-        uint64_t k = key(v);
-        auto it = pointIds.find(k);
-        if (it != pointIds.end()) return it->second;
+        auto c = cellOf(v);
+        for (int64_t dx = -1; dx <= 1; dx++)
+            for (int64_t dy = -1; dy <= 1; dy++)
+                for (int64_t dz = -1; dz <= 1; dz++) {
+                    auto it = grid.find(cellKey(c[0] + dx, c[1] + dy, c[2] + dz));
+                    if (it == grid.end()) continue;
+                    for (uint32_t id : it->second)
+                        if (points[id].distTo(v) <= weld) return id;
+                }
         uint32_t id = (uint32_t)points.size();
         points.push_back(v);
-        pointIds[k] = id;
+        grid[cellKey(c[0], c[1], c[2])].push_back(id);
         return id;
     };
     for (uint32_t fi : region) {
