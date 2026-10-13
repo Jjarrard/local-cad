@@ -43,7 +43,7 @@ bool saveProject(const std::string& filepath) {
         return false;
     }
 
-    f << "SIMPLECAD_V1\n";
+    f << "LOCALCAD_V1\n";
 
     // Save solids
     f << "SOLIDS " << app.solids.size() << "\n";
@@ -98,7 +98,8 @@ bool loadProject(const std::string& filepath) {
 
     std::string token;
     f >> token;
-    if (token != "SIMPLECAD_V1") return false;
+    // SIMPLECAD_V1 is the same format, written before the rename to local-cad.
+    if (token != "LOCALCAD_V1" && token != "SIMPLECAD_V1") return false;
 
     // Parse into temporary structures so we don't destroy current state on error
     std::vector<Solid> tempSolids;
@@ -247,7 +248,7 @@ bool loadProject(const std::string& filepath) {
 }
 
 bool saveProjectInteractive() {
-    std::string filepath = app.projectPathBuf[0] != '\0' ? app.projectPathBuf : "project.scad";
+    std::string filepath = app.projectPathBuf[0] != '\0' ? app.projectPathBuf : "project.lcad";
 #ifdef __APPLE__
     char selectedPath[sizeof(app.projectPathBuf)] = "";
     if (!showNativeProjectSaveDialog(filepath.c_str(), selectedPath, sizeof(selectedPath))) {
@@ -267,7 +268,7 @@ bool saveProjectInteractive() {
 }
 
 bool loadProjectInteractive() {
-    std::string filepath = app.projectPathBuf[0] != '\0' ? app.projectPathBuf : "project.scad";
+    std::string filepath = app.projectPathBuf[0] != '\0' ? app.projectPathBuf : "project.lcad";
 #ifdef __APPLE__
     char selectedPath[sizeof(app.projectPathBuf)] = "";
     if (!showNativeProjectOpenDialog(filepath.c_str(), selectedPath, sizeof(selectedPath))) {
@@ -331,7 +332,7 @@ bool exportStl(const std::string& filepath) {
     }
 
     char header[80] = {};
-    std::snprintf(header, sizeof(header), "SimpleCad binary STL");
+    std::snprintf(header, sizeof(header), "local-cad binary STL");
     f.write(header, sizeof(header));
 
     uint32_t count = (uint32_t)tris.size();

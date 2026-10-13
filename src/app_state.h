@@ -311,7 +311,7 @@ struct AppState {
     // free screen space — worth a key on a 1280-wide laptop where they cost
     // a third of the width.
     bool panelsVisible = true;
-    char projectPathBuf[512] = "project.scad";
+    char projectPathBuf[512] = "project.lcad";
     bool showExportStlDialog = false;
     bool focusExportStlPath = false;
     char exportStlPathBuf[512] = "export.stl";

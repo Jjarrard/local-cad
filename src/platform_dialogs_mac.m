@@ -42,12 +42,12 @@ static void configureSavePanel(NSSavePanel* panel, NSString* title, NSString* ex
     }
 }
 
-static void configureOpenPanel(NSOpenPanel* panel, NSString* title, NSString* extension, const char* suggestedPath) {
+static void configureOpenPanel(NSOpenPanel* panel, NSString* title, NSArray<NSString*>* extensions, const char* suggestedPath) {
     [panel setTitle:title];
     [panel setCanChooseFiles:YES];
     [panel setCanChooseDirectories:NO];
     [panel setAllowsMultipleSelection:NO];
-    [panel setAllowedFileTypes:@[extension]];
+    [panel setAllowedFileTypes:extensions];
 
     if (suggestedPath && suggestedPath[0] != '\0') {
         NSString* path = [NSString stringWithUTF8String:suggestedPath];
@@ -83,7 +83,7 @@ bool showNativeProjectSaveDialog(const char* suggestedPath, char* outPath, size_
         }
 
         NSSavePanel* panel = [NSSavePanel savePanel];
-        configureSavePanel(panel, @"Save Project", @"scad", suggestedPath);
+        configureSavePanel(panel, @"Save Project", @"lcad", suggestedPath);
         if ([panel runModal] != NSModalResponseOK) {
             return false;
         }
@@ -99,7 +99,8 @@ bool showNativeProjectOpenDialog(const char* suggestedPath, char* outPath, size_
         }
 
         NSOpenPanel* panel = [NSOpenPanel openPanel];
-        configureOpenPanel(panel, @"Open Project", @"scad", suggestedPath);
+        // .scad: projects saved before the rename to local-cad
+        configureOpenPanel(panel, @"Open Project", @[@"lcad", @"scad"], suggestedPath);
         if ([panel runModal] != NSModalResponseOK) {
             return false;
         }

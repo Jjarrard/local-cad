@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(SimpleCad VERSION 0.1.0 LANGUAGES C CXX)
+project(LocalCad VERSION 0.1.0 LANGUAGES C CXX)
 
 if(APPLE)
     enable_language(OBJC)
@@ -53,8 +53,8 @@ if(APPLE)
     target_compile_definitions(imgui PUBLIC GL_SILENCE_DEPRECATION)
 endif()
 
-# --- SimpleCad executable ---
-add_executable(simplecad
+# --- local-cad executable ---
+add_executable(local-cad
     src/main.cpp
     src/input.cpp
     src/tool_edge_modifier.cpp
@@ -75,30 +75,30 @@ add_executable(simplecad
 )
 
 if(APPLE)
-    target_sources(simplecad PRIVATE src/platform_dialogs_mac.m)
+    target_sources(local-cad PRIVATE src/platform_dialogs_mac.m)
 endif()
 
-target_include_directories(simplecad PRIVATE src)
-target_link_libraries(simplecad PRIVATE glfw imgui)
+target_include_directories(local-cad PRIVATE src)
+target_link_libraries(local-cad PRIVATE glfw imgui)
 
 # Platform OpenGL linking
 if(APPLE)
-    target_link_libraries(simplecad PRIVATE
+    target_link_libraries(local-cad PRIVATE
         "-framework OpenGL"
         "-framework Cocoa"
         "-framework IOKit"
         "-framework CoreVideo"
     )
-    target_compile_definitions(simplecad PRIVATE GL_SILENCE_DEPRECATION)
+    target_compile_definitions(local-cad PRIVATE GL_SILENCE_DEPRECATION)
 elseif(UNIX)
     find_package(OpenGL REQUIRED)
-    target_link_libraries(simplecad PRIVATE OpenGL::GL dl pthread)
+    target_link_libraries(local-cad PRIVATE OpenGL::GL dl pthread)
 elseif(WIN32)
-    target_link_libraries(simplecad PRIVATE opengl32)
+    target_link_libraries(local-cad PRIVATE opengl32)
 endif()
 
 # Compiler warnings
-target_compile_options(simplecad PRIVATE
+target_compile_options(local-cad PRIVATE
     $<$<CXX_COMPILER_ID:Clang,AppleClang,GNU>:-Wall -Wextra -Wno-unused-parameter>
     $<$<CXX_COMPILER_ID:MSVC>:/W4>
 )

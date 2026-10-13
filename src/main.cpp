@@ -31,7 +31,7 @@ using namespace cad;
 AppState app;
 
 int main(int argc, char** argv) {
-    // Headless export: `simplecad part.scad --export-stl out.stl`.  Useful for
+    // Headless export: `local-cad part.lcad --export-stl out.stl`.  Useful for
     // scripting a build, and it exercises the exporter without a window.
     if (argc >= 4 && std::string(argv[2]) == "--export-stl") {
         if (!loadProject(argv[1])) {
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 #endif
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    GLFWwindow* window = glfwCreateWindow(1280, 800, "SimpleCad", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 800, "local-cad", nullptr, nullptr);
     if (!window) {
         std::fprintf(stderr, "Failed to create window\n");
         glfwTerminate();
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     app.camera.yaw = 45.0f;
     app.camera.pitch = 30.0f;
 
-    // Open a project passed on the command line, so `simplecad part.scad`
+    // Open a project passed on the command line, so `local-cad part.lcad`
     // works from a terminal or a file manager.
     if (argc > 1 && argv[1][0] != '\0') {
         std::snprintf(app.projectPathBuf, sizeof(app.projectPathBuf), "%s", argv[1]);

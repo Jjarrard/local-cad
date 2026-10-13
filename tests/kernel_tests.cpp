@@ -408,7 +408,7 @@ static void testCameraBasis() {
 }
 
 int main() {
-    std::printf("SimpleCad kernel tests\n======================\n");
+    std::printf("local-cad kernel tests\n======================\n");
     testBooleans();
     testExtrudeOrientation();
     testHoles();

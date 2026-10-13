@@ -1,10 +1,10 @@
-# SimpleCad
+# local-cad
 
 A small, from-scratch CAD application in C++. Sketch a profile, extrude it, cut
 holes, chamfer edges, export STL. No cloud, no accounts, no plugin system — a
 single ~3 MB binary that opens instantly.
 
-![SimpleCad](docs/screenshot.png)
+![local-cad](docs/screenshot.png)
 
 Two external dependencies (GLFW and Dear ImGui, both fetched by CMake). The
 geometry kernel, renderer and UI are all in this repo.
@@ -26,17 +26,17 @@ to be portable but Windows and Linux are currently unverified.
 cmake -B build
 cmake --build build -j 8
 
-./build/simplecad                 # empty document
-./build/simplecad showcase.scad   # open a file directly
+./build/local-cad                 # empty document
+./build/local-cad showcase.lcad   # open a file directly
 
 # Export without opening a window
-./build/simplecad showcase.scad --export-stl part.stl
+./build/local-cad showcase.lcad --export-stl part.stl
 
 # Run the kernel tests
 ./build/kernel_tests
 ```
 
-`showcase.scad` is the model in the screenshot above.
+`showcase.lcad` is the model in the screenshot above.
 
 ---
 
@@ -113,8 +113,8 @@ dragging or by typing an offset, sketch on it, or use it as a cutting plane.
 
 **Measure** — distance between two points.
 
-**Files** — save/load projects (the format carries hole loops and still reads
-older files). Binary STL export, from the UI or headlessly with
+**Files** — save/load `.lcad` projects (the format carries hole loops and still
+reads older files, including `.scad` projects from before the rename). Binary STL export, from the UI or headlessly with
 `--export-stl`. A single body exports watertight and manifold, including parts
 with many bores; a multi-body export is several shells in one file, which is
 normal for STL.
