@@ -12,3 +12,6 @@ cmake-build-*/
 
 # Exported artefacts
 *.stl
+
+# Dear ImGui window layout (per-user)
+imgui.ini

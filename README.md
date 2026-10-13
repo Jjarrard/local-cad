@@ -196,5 +196,4 @@ snapping), `renderer.*` (OpenGL), `picking.cpp`, `extrude.cpp`,
 
 ## Licence
 
-No licence has been chosen yet, so default copyright applies. Open an issue if
-you want to use this for anything.
+[MIT](LICENSE).
