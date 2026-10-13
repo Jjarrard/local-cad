@@ -17,6 +17,13 @@ geometry kernel, renderer and UI are all in this repo.
 
 ---
 
+## Download
+
+A prebuilt macOS binary (Apple Silicon and Intel, macOS 12+) is on the
+[releases page](https://github.com/Jjarrard/local-cad/releases/latest). It
+isn't signed with an Apple developer ID, so the first time, right-click it in
+Finder and choose **Open**. The zip includes a short README.
+
 ## Build and run
 
 Requires CMake 3.20+ and a C++17 compiler. Tested on macOS; the code is written
